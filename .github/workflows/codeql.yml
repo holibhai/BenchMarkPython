@@ -1,0 +1,52 @@
+name: CodeQL Python Research Scan
+
+on:
+  workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  codeql:
+    name: CodeQL Research Scan
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
+      actions: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4.2.2
+
+      - name: Start timer
+        run: echo "START_TIME=$(date +%s)" >> $GITHUB_ENV
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: python
+          queries: security-extended
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          output: codeql-results
+          upload: true
+
+      - name: End timer
+        run: |
+          END_TIME=$(date +%s)
+          DURATION=$((END_TIME - $START_TIME))
+          echo "CodeQL execution time: $DURATION seconds" | tee codeql-time.txt
+
+      - name: List results for debug
+        run: ls -la codeql-results/ || echo "No results directory found"
+
+      - name: Upload CodeQL research artifacts
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: codeql-research-results
+          path: |
+            codeql-results/
+            codeql-time.txt
