@@ -3,19 +3,21 @@ name: Baseline Python Workflow
 on:
   workflow_dispatch:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   baseline:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
 
       - name: Start timer
         run: echo "START_TIME=$(date +%s)" >> $GITHUB_ENV
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v5.6.0
         with:
           python-version: "3.11"
 
@@ -31,7 +33,7 @@ jobs:
           echo "Baseline execution time: $DURATION seconds" | tee baseline-time.txt
 
       - name: Upload baseline time artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: baseline-time
           path: baseline-time.txt
